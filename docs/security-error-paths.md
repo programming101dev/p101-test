@@ -1,6 +1,6 @@
 # Error paths as vulnerability paths
 
-`p101-error-path-walk` is a correctness tool, but it is also a small security
+`test-faults` is a correctness tool, but it is also a small security
 lab. Many C vulnerabilities happen after the happy path has already failed:
 
 - cleanup code frees the same object twice;
@@ -20,7 +20,8 @@ fail p101 call #3
 ...
 ```
 
-Each injected run follows the same capture/model/policy pipeline as `p101 run`,
+Each injected run follows the same capture/model/policy pipeline as
+`scripts/runtime/p101-run.py`,
 so the same run produces:
 
 - a resource log;
@@ -38,7 +39,7 @@ That means the lesson is not “remember to check errors.” The lesson is:
 
 1. Give students a small p101 program that is clean on the happy path.
 2. Ask them to predict which wrapper failures are likely to expose bugs.
-3. Run `p101-error-path-walk`.
+3. Run `test-faults`.
 4. Fix the first finding only.
 5. Run the walker again.
 6. Repeat until all injected error paths are clean.

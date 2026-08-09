@@ -17,7 +17,7 @@
 #define CALL_LOG_ARGS_ENV P101_ENV_CALL_LOG_ARGS_ENV
 #define CALL_LOG_RESULT_ENV P101_ENV_CALL_LOG_RESULT_ENV
 
-/* The child-side names are the p101-observe launch protocol, not lib_env. */
+/* The child-side names are the inspect-capture launch protocol, not lib_env. */
 #define CHILD_FAULT_CALL_ENV "P101_OBSERVE_CHILD_FAULT_CALL"
 #define CHILD_FAULT_ERRNO_ENV "P101_OBSERVE_CHILD_FAULT_ERRNO"
 #define CHILD_FAULT_LOG_ENV "P101_OBSERVE_CHILD_FAULT_LOG"
@@ -26,12 +26,12 @@
 #define CHILD_FAULT_AMOUNT_ENV "P101_OBSERVE_CHILD_FAULT_AMOUNT"
 #define CHILD_FAULT_REPEAT_ENV "P101_OBSERVE_CHILD_FAULT_REPEAT"
 #define DEFAULT_RUN_PATH "p101-run.py"
-#define DEFAULT_OBSERVE_PATH "p101-observe"
+#define DEFAULT_OBSERVE_PATH "inspect-capture"
 #define DEFAULT_ANALYZE_PATH "p101-analyze.py"
 #define DEFAULT_MODEL_PATH "p101-event-model"
 #define RESOURCE_POLICY_SCHEMA "p101-resource-policy-findings-v1"
 #define ANALYSIS_POLICY_SCHEMA "p101-analysis-findings-v1"
-#define DEFAULT_LOG_PREFIX "/tmp/p101-error-path-walk"
+#define DEFAULT_LOG_PREFIX "/tmp/test-faults"
 
 enum
 {

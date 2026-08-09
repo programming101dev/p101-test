@@ -176,7 +176,7 @@ int p101_error_path_walk_run(const struct p101_env *env, struct p101_error *err,
 
         if((int)result.fault_hit == 0)
         {
-            p101_printf(env, err, "p101-error-path-walk: exhausted after %u fault-capable call%s.\n", index - 1U, (index - 1U) == 1U ? "" : "s");
+            p101_printf(env, err, "test-faults: exhausted after %u fault-capable call%s.\n", index - 1U, (index - 1U) == 1U ? "" : "s");
             break;
         }
 
@@ -185,7 +185,7 @@ int p101_error_path_walk_run(const struct p101_env *env, struct p101_error *err,
         update_fault_group(env, err, groups, &group_count, &result);
     }
 
-    p101_printf(env, err, "p101-error-path-walk: %zu run%s, %zu policy finding%s.\n", runs, runs == 1 ? "" : "s", findings, findings == 1 ? "" : "s");
+    p101_printf(env, err, "test-faults: %zu run%s, %zu policy finding%s.\n", runs, runs == 1 ? "" : "s", findings, findings == 1 ? "" : "s");
     print_fault_groups(env, err, groups, group_count);
 
 done:
@@ -275,7 +275,7 @@ static void print_fault_groups(const struct p101_env *env, struct p101_error *er
         goto done;
     }
 
-    p101_fputs(env, err, "p101-error-path-walk: grouped by faulted wrapper:\n", stdout);
+    p101_fputs(env, err, "test-faults: grouped by faulted wrapper:\n", stdout);
 
     for(size_t i = 0; i < group_count; i++)
     {
@@ -476,7 +476,7 @@ static int run_p101_pipeline(const struct p101_env *env, struct p101_error *err,
 
     if(args->command_argv[command_index] != NULL)
     {
-        P101_ERROR_RAISE_USER(err, "The command has too many arguments for p101-error-path-walk.", ERR_USAGE);
+        P101_ERROR_RAISE_USER(err, "The command has too many arguments for test-faults.", ERR_USAGE);
         goto done;
     }
 
@@ -485,7 +485,7 @@ static int run_p101_pipeline(const struct p101_env *env, struct p101_error *err,
 
         options.stdout_path         = result->pipeline_stdout_path;
         options.stderr_path         = result->pipeline_stderr_path;
-        options.diagnostic_name     = "p101-error-path-walk";
+        options.diagnostic_name     = "test-faults";
         options.output_mode         = REPORT_FILE_MODE;
         options.child_setup         = NULL;
         options.child_setup_context = NULL;

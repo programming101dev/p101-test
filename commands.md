@@ -1,6 +1,6 @@
 # Commands
 
-Quick reference for `p101-error-path-walk`. Every script also supports `--help`.
+Quick reference for `test-faults`. Every script also supports `--help`.
 Run `./change-compiler.sh -c <compiler>` once before building.
 
 | Command | What it does |
@@ -25,14 +25,14 @@ Program examples:
 
 | Command | What it does |
 | --- | --- |
-| `p101-error-path-walk -- ./prog` | Run `./prog` normally, then walk fault injections until no fault fires |
-| `p101-error-path-walk -n 0 -- ./prog` | Baseline only |
-| `p101-error-path-walk -n 20 -l /tmp/run -- ./prog config.txt` | Run baseline plus fault calls up to 20 using `/tmp/run-*` capture/analysis directories |
-| `p101-error-path-walk -F p101_open -- ./prog config.txt` | Walk only the exact `p101_open` API identity |
-| `p101-error-path-walk -E 24 -- ./prog config.txt` | Inject errno `24` instead of the default `EIO` |
-| `p101-error-path-walk -O ../p101-observe/build-clang/p101-observe -- ./prog` | Use an in-tree p101-observe build |
-| `p101-error-path-walk -U ../../scripts/runtime/p101-run.py -Y ../../scripts/runtime/p101-analyze.py -- ./prog` | Use the in-tree shared runtime drivers |
-| `p101-error-path-walk -B ../../libraries/lib_tool_event/build-clang/p101-event-model -- ./prog` | Use an in-tree shared event-model build |
+| `test-faults -- ./prog` | Run `./prog` normally, then walk fault injections until no fault fires |
+| `test-faults -n 0 -- ./prog` | Baseline only |
+| `test-faults -n 20 -l /tmp/run -- ./prog config.txt` | Run baseline plus fault calls up to 20 using `/tmp/run-*` capture/analysis directories |
+| `test-faults -F p101_open -- ./prog config.txt` | Walk only the exact wrapper API identity |
+| `test-faults -E 24 -- ./prog config.txt` | Inject errno `24` instead of the default `EIO` |
+| `test-faults -O ../p101-inspect/inspect-capture -- ./prog` | Use the in-tree capture launcher |
+| `test-faults -U ../../scripts/runtime/p101-run.py -Y ../../scripts/runtime/p101-analyze.py -- ./prog` | Use the in-tree shared runtime drivers |
+| `test-faults -B ../../libraries/lib_tool_event/build-clang/p101-event-model -- ./prog` | Use an in-tree shared event-model build |
 
 The final summary groups injected runs by faulted wrapper name and resource
 finding count.

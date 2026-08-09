@@ -101,7 +101,7 @@ static int inject_selected_failure(const struct p101_env *unused_env, const char
 
 static void test_parse_accepts_command_after_options(void)
 {
-    char            *argv[] = {"p101-error-path-walk", "-n", "3", "-l", "walk", "-U", "p101-run.py", "-O", "p101-observe", "-Y", "p101-analyze.py", "-B", "p101-event-model", "-E", "12", "-F", "p101_open", "--", "prog", "arg", NULL};
+    char            *argv[] = {"test-faults", "-n", "3", "-l", "walk", "-U", "p101-run.py", "-O", "inspect-capture", "-Y", "p101-analyze.py", "-B", "p101-event-model", "-E", "12", "-F", "p101_open", "--", "prog", "arg", NULL};
     struct arguments args;
 
     reset_getopt();
@@ -116,7 +116,7 @@ static void test_parse_accepts_command_after_options(void)
     TEST_ASSERT_EQUAL_INT(12, args.fault_errno);
     TEST_ASSERT_EQUAL_STRING("walk", args.log_prefix);
     TEST_ASSERT_EQUAL_STRING("p101-run.py", args.p101_run);
-    TEST_ASSERT_EQUAL_STRING("p101-observe", args.p101_observe);
+    TEST_ASSERT_EQUAL_STRING("inspect-capture", args.p101_observe);
     TEST_ASSERT_EQUAL_STRING("p101-analyze.py", args.p101_analyze);
     TEST_ASSERT_EQUAL_STRING("p101-event-model", args.event_model);
     TEST_ASSERT_EQUAL_STRING("p101_open", args.fault_name);
@@ -126,7 +126,7 @@ static void test_parse_accepts_command_after_options(void)
 
 static void test_parse_accepts_short_io_and_repeat(void)
 {
-    char            *argv[] = {"p101-error-path-walk", "-F", "p101_read", "-M", "short", "-A", "7", "-R", "3", "--", "prog", NULL};
+    char            *argv[] = {"test-faults", "-F", "p101_read", "-M", "short", "-A", "7", "-R", "3", "--", "prog", NULL};
     struct arguments args;
 
     reset_getopt();
@@ -144,7 +144,7 @@ static void test_parse_accepts_short_io_and_repeat(void)
 
 static void test_short_io_requires_supported_wrapper_filter(void)
 {
-    char            *argv[] = {"p101-error-path-walk", "-M", "short", "--", "prog", NULL};
+    char            *argv[] = {"test-faults", "-M", "short", "--", "prog", NULL};
     struct arguments args;
 
     reset_getopt();
@@ -158,7 +158,7 @@ static void test_short_io_requires_supported_wrapper_filter(void)
 
 static void test_parse_rejects_missing_command(void)
 {
-    char            *argv[] = {"p101-error-path-walk", "-n", "0", NULL};
+    char            *argv[] = {"test-faults", "-n", "0", NULL};
     struct arguments args;
 
     reset_getopt();
@@ -287,7 +287,7 @@ static void test_argument_validation_covers_null_empty_modes_and_short_names(voi
 static void test_file_exists_checks_real_files(void)
 {
     TEST_ASSERT_TRUE(p101_error_path_walk_file_exists(env, __FILE__));
-    TEST_ASSERT_FALSE(p101_error_path_walk_file_exists(env, "/tmp/p101-error-path-walk-definitely-missing-file"));
+    TEST_ASSERT_FALSE(p101_error_path_walk_file_exists(env, "/tmp/test-faults-definitely-missing-file"));
     p101_error_path_walk_test_force_error_create_failure(true);
     TEST_ASSERT_FALSE(p101_error_path_walk_file_exists(env, __FILE__));
     {
@@ -305,7 +305,7 @@ static void test_resource_policy_summary(void)
     static const char     json[] = "{\"schema\":\"p101-resource-policy-findings-v1\",\"findings\":[{\"id\":\"P101-FD-001\"}],\"summary\":{\"records\":3,\"processes\":1,\"findings\":1,\"process_metrics\":[]}}\n";
     struct policy_summary summary;
     FILE                 *stream;
-    char                  path[] = "/tmp/p101-error-path-walk-resource-XXXXXX";
+    char                  path[] = "/tmp/test-faults-resource-XXXXXX";
     int                   fd;
 
     fd = p101_mkstemp(env, error, path);
@@ -334,7 +334,7 @@ static void write_text_file(char path[PATH_LEN], const char *text)
     FILE *stream;
     int   fd;
 
-    p101_strncpy(env, path, "/tmp/p101-error-path-walk-test-XXXXXX", PATH_LEN);
+    p101_strncpy(env, path, "/tmp/test-faults-test-XXXXXX", PATH_LEN);
     path[PATH_LEN - 1U] = '\0';
     fd                  = p101_mkstemp(env, error, path);
     TEST_ASSERT_NOT_EQUAL(-1, fd);
@@ -411,7 +411,7 @@ static void test_fault_log_parser_covers_supported_and_invalid_records(void)
     char path[PATH_LEN];
     char name[NAME_LEN];
 
-    TEST_ASSERT_FALSE(p101_error_path_walk_read_fault_hit(env, error, "/tmp/p101-error-path-walk-no-fault-log", name));
+    TEST_ASSERT_FALSE(p101_error_path_walk_read_fault_hit(env, error, "/tmp/test-faults-no-fault-log", name));
     TEST_ASSERT_FALSE(p101_error_has_error(error));
 
     write_text_file(path, "noise only\n");
@@ -512,7 +512,7 @@ static void test_policy_reader_handles_missing_and_growth(void)
     char                  path[PATH_LEN];
     char                 *large;
 
-    p101_error_path_walk_read_policy_json(env, error, "/tmp/p101-error-path-walk-missing-summary", RESOURCE_POLICY_SCHEMA, &summary);
+    p101_error_path_walk_read_policy_json(env, error, "/tmp/test-faults-missing-summary", RESOURCE_POLICY_SCHEMA, &summary);
     TEST_ASSERT_TRUE(p101_error_has_error(error));
     TEST_ASSERT_FALSE(summary.parsed);
     p101_error_reset(error);
@@ -583,7 +583,7 @@ static void init_runner_arguments(struct arguments *args, char *const command[])
     args->p101_observe = "observe";
     args->p101_analyze = "analyze";
     args->event_model  = "model";
-    args->log_prefix   = "/tmp/p101-error-path-walk-unit";
+    args->log_prefix   = "/tmp/test-faults-unit";
     args->command_argv = command;
 }
 
@@ -634,11 +634,11 @@ static void test_run_observe_covers_argument_flush_fork_wait_and_child_failures(
 
     init_runner_arguments(&args, command);
     p101_memset(env, &result, 0, sizeof(result));
-    p101_snprintf(env, error, stdout_path, sizeof(stdout_path), "/tmp/p101-error-path-walk-child-%ld.out", (long)p101_getpid(env));
-    p101_snprintf(env, error, stderr_path, sizeof(stderr_path), "/tmp/p101-error-path-walk-child-%ld.err", (long)p101_getpid(env));
+    p101_snprintf(env, error, stdout_path, sizeof(stdout_path), "/tmp/test-faults-child-%ld.out", (long)p101_getpid(env));
+    p101_snprintf(env, error, stderr_path, sizeof(stderr_path), "/tmp/test-faults-child-%ld.err", (long)p101_getpid(env));
     p101_strncpy(env, result.pipeline_stdout_path, stdout_path, sizeof(result.pipeline_stdout_path));
     p101_strncpy(env, result.pipeline_stderr_path, stderr_path, sizeof(result.pipeline_stderr_path));
-    p101_strncpy(env, result.run_dir, "/tmp/p101-error-path-walk-run", sizeof(result.run_dir));
+    p101_strncpy(env, result.run_dir, "/tmp/test-faults-run", sizeof(result.run_dir));
 
     TEST_ASSERT_EQUAL_INT(0, p101_error_path_walk_test_run_observe(env, error, &args, &result));
     TEST_ASSERT_FALSE(p101_error_has_error(error));
@@ -674,7 +674,7 @@ static void test_run_observe_covers_argument_flush_fork_wait_and_child_failures(
     p101_error_reset(error);
 
     p101_env_set_fault_injector(env, NULL, NULL);
-    args.p101_run = "/tmp/p101-error-path-walk-no-such-runner";
+    args.p101_run = "/tmp/test-faults-no-such-runner";
     TEST_ASSERT_EQUAL_INT(EXEC_FAILURE << 8, p101_error_path_walk_test_run_observe(env, error, &args, &result));
     TEST_ASSERT_FALSE(p101_error_has_error(error));
 
@@ -781,7 +781,7 @@ static void test_run_one_case_and_run_cover_error_boundaries(void)
         char invalid_path[PATH_LEN];
 
         init_runner_arguments(&args, command);
-        p101_snprintf(env, error, unique_prefix, sizeof(unique_prefix), "/tmp/p101-error-path-walk-malformed-%ld", (long)p101_getpid(env));
+        p101_snprintf(env, error, unique_prefix, sizeof(unique_prefix), "/tmp/test-faults-malformed-%ld", (long)p101_getpid(env));
         args.log_prefix = unique_prefix;
         p101_error_path_walk_make_log_paths(env, error, &args, 0U, &result);
         TEST_ASSERT_EQUAL_INT(0, p101_mkdir(env, error, result.run_dir, 0700));

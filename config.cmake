@@ -1,6 +1,6 @@
-set(PROJECT_NAME "p101-error-path-walk")
-set(PROJECT_VERSION "1.0.0")
-set(PROJECT_DESCRIPTION "Runs a p101 program repeatedly with fault-injection environment settings")
+set(PROJECT_NAME "p101-test")
+set(PROJECT_VERSION "2.0.0")
+set(PROJECT_DESCRIPTION "Programming 101 executable fault and mutation test engines")
 set(PROJECT_LANGUAGE "C")
 
 set(CMAKE_C_STANDARD 17)
@@ -25,11 +25,12 @@ set(BSD_STANDARD_FLAGS
 )
 
 # Define targets
-set(EXECUTABLE_TARGETS main)
+set(EXECUTABLE_TARGETS test_faults test_mutation)
 set(LIBRARY_TARGETS "")
-set(main_OUTPUT_NAME p101-error-path-walk)
+set(test_faults_OUTPUT_NAME test-faults)
+set(test_mutation_OUTPUT_NAME test-mutation)
 
-set(main_SOURCES
+set(test_faults_SOURCES
         src/cli.c
         src/main.c
         src/paths.c
@@ -38,7 +39,16 @@ set(main_SOURCES
         src/runner.c
 )
 
-set(main_HEADERS
+set(test_mutation_SOURCES
+        components/mutation/src/candidates.c
+        components/mutation/src/cli.c
+        components/mutation/src/execution.c
+        components/mutation/src/files.c
+        components/mutation/src/main.c
+        components/mutation/src/output.c
+)
+
+set(test_faults_HEADERS
         include/arguments.h
         include/cli.h
         include/constants.h
@@ -50,7 +60,11 @@ set(main_HEADERS
         include/runner.h
 )
 
-set(main_LINK_LIBRARIES
+set(test_mutation_HEADERS
+        components/mutation/include/mutation_check.h
+)
+
+set(test_faults_LINK_LIBRARIES
         p101_error
         p101_env
         p101_record
@@ -62,5 +76,19 @@ set(main_LINK_LIBRARIES
         p101_process
         p101_convert
         p101_util
+        m
+)
+
+set(test_mutation_LINK_LIBRARIES
+        p101_error
+        p101_env
+        p101_record
+        p101_tool_event
+        p101_c
+        p101_c_facts
+        p101_filesystem
+        p101_io
+        p101_process
+        p101_time
         m
 )

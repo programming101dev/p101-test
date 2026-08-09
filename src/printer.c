@@ -22,11 +22,11 @@ void p101_error_path_walk_print_run_result(const struct p101_env *env, struct p1
 {
     if(result->fault_index == 0)
     {
-        p101_fputs(env, err, "p101-error-path-walk: baseline ", stdout);
+        p101_fputs(env, err, "test-faults: baseline ", stdout);
     }
     else
     {
-        p101_printf(env, err, "p101-error-path-walk: fault %u ", result->fault_index);
+        p101_printf(env, err, "test-faults: fault %u ", result->fault_index);
 
         if(result->fault_hit)
         {

@@ -1,5 +1,5 @@
 /*
- * libFuzzer harness for p101-error-path-walk's argument parser
+ * libFuzzer harness for test-faults's argument parser
  * (src/cli.c: p101_error_path_walk_parse_arguments()). This fuzzes the code YOU write, not a
  * library function.
  */

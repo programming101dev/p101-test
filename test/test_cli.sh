@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tool="${1:?usage: test_cli.sh <p101-error-path-walk>}"
-work="$(mktemp -d "${TMPDIR:-/tmp}/p101-error-path-walk-cli.XXXXXX")"
+tool="${1:?usage: test_cli.sh <test-faults>}"
+work="$(mktemp -d "${TMPDIR:-/tmp}/test-faults-cli.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 
 expect_status() {

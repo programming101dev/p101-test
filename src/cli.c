@@ -212,7 +212,7 @@ void p101_error_path_walk_check_arguments(const struct p101_env *env, struct p10
     p101_call_result_4 = required_text_missing(args->p101_observe);
     if(p101_call_result_4)
     {
-        P101_ERROR_RAISE_USER(err, "The p101-observe path must not be empty.", ERR_USAGE);
+        P101_ERROR_RAISE_USER(err, "The inspect-capture path must not be empty.", ERR_USAGE);
         goto done;
     }
 
@@ -349,7 +349,7 @@ void p101_error_path_walk_usage(const struct p101_env *env, struct p101_error *e
     p101_fprintf(env,
                  err,
                  stderr,
-                 "Usage: %s [-h] [-v] [-n <count>] [-l <prefix>] [-U <p101-run>] [-O <p101-observe>] [-Y <p101-analyze>] [-B <p101-event-model>] [-E <errno>] [-F <name>] [-M <mode>] [-A <amount>] [-R <count>] -- <command> [args...]\n",
+                 "Usage: %s [-h] [-v] [-n <count>] [-l <prefix>] [-U <p101-run>] [-O <inspect-capture>] [-Y <p101-analyze>] [-B <p101-event-model>] [-E <errno>] [-F <name>] [-M <mode>] [-A <amount>] [-R <count>] -- <command> [args...]\n",
                  program_name);
     p101_fputs(env, err, "Options:\n", stderr);
     p101_fputs(env, err, "  -h                      Display this help message and exit\n", stderr);
@@ -358,7 +358,7 @@ void p101_error_path_walk_usage(const struct p101_env *env, struct p101_error *e
     p101_fputs(env, err, "                          (default: 1024, stops early when no fault fires)\n", stderr);
     p101_fputs(env, err, "  -l <prefix>             Prefix for per-case capture and analysis directories\n", stderr);
     p101_fputs(env, err, "  -U <p101-run>           Shared capture/analyze driver (default: PATH lookup)\n", stderr);
-    p101_fputs(env, err, "  -O <p101-observe>       p101-observe executable (default: PATH lookup)\n", stderr);
+    p101_fputs(env, err, "  -O <inspect-capture>       inspect-capture executable (default: PATH lookup)\n", stderr);
     p101_fputs(env, err, "  -Y <p101-analyze>       Shared policy-analysis driver (default: PATH lookup)\n", stderr);
     p101_fputs(env, err, "  -B <p101-event-model>   Shared event-model builder (default: PATH lookup)\n", stderr);
     p101_fputs(env, err, "  -E <errno>              errno injected by failed wrappers (default: EIO)\n", stderr);

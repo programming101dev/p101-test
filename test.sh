@@ -264,3 +264,20 @@ if [ "$coverage" -eq 1 ]; then
 fi
 echo ">> building tests"; cmake --build "$test_bd"
 echo ">> ctest"; ( cd "$test_bd" && ctest --output-on-failure ${ctest_args[@]+"${ctest_args[@]}"} )
+
+component_test_bd="components/mutation/test/build-$sfx"
+if [ "$coverage" -eq 1 ]; then
+  rm -rf "$component_test_bd"
+fi
+echo ">> configuring mutation tests ($component_test_bd)"
+cmake -S components/mutation/test -B "$component_test_bd" "$compflag" \
+  -DCMAKE_POSITION_INDEPENDENT_CODE=ON "$compile_flag_arg" \
+  ${sanitizer_args[@]+"${sanitizer_args[@]}"} \
+  ${p101_path_args[@]+"${p101_path_args[@]}"} "$cov_arg" >/dev/null
+if [ "$coverage" -eq 1 ]; then
+  find "$component_test_bd" -type f -name '*.gcda' -exec rm -f {} +
+fi
+echo ">> building mutation tests"
+cmake --build "$component_test_bd"
+echo ">> ctest: mutation"
+( cd "$component_test_bd" && ctest --output-on-failure ${ctest_args[@]+"${ctest_args[@]}"} )
