@@ -30,6 +30,16 @@ void p101_error_path_walk_arguments_init(const struct p101_env *env, struct argu
     args->stop_at_exhaustion = true;
 }
 
+void p101_error_path_walk_arguments_deinit(const struct p101_env *env, struct arguments *args)
+{
+    P101_TRACE_SCOPE(env);
+    /*
+     * The struct owns nothing today; zeroing it keeps a freed view from
+     * looking live and keeps every call site uniform if that changes.
+     */
+    p101_memset(env, args, 0, sizeof(*args));
+}
+
 void p101_error_path_walk_parse_arguments(const struct p101_env *env, struct p101_error *err, int argc, char *argv[], struct arguments *args)
 {
     int  p101_expression_result_12;

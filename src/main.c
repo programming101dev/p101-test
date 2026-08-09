@@ -94,6 +94,7 @@ done:
     }
 }
 
+    p101_error_path_walk_arguments_deinit(env, &args);
     p101_env_destroy(env);
     p101_error_destroy(err);
 

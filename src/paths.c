@@ -275,11 +275,15 @@ static bool fault_semantics_valid(const struct p101_env *env, const char *mode, 
 
         if(p101_call_result_7)
         {
-            int p101_call_result_8;
-            int p101_call_result_9;
+            const char *phase_word;
+            const char *disposition_word;
+            int         p101_call_result_8;
+            int         p101_call_result_9;
 
-            p101_call_result_8 = p101_strcmp(env, phase, p101_env_fault_phase_name(defaults.phase));
-            p101_call_result_9 = p101_strcmp(env, disposition, p101_env_fault_disposition_name(defaults.disposition));
+            phase_word         = p101_env_fault_phase_name(defaults.phase);
+            disposition_word   = p101_env_fault_disposition_name(defaults.disposition);
+            p101_call_result_8 = p101_strcmp(env, phase, phase_word);
+            p101_call_result_9 = p101_strcmp(env, disposition, disposition_word);
             valid              = (p101_call_result_8 == 0 && p101_call_result_9 == 0) != 0;
         }
     }
