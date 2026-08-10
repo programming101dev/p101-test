@@ -50,92 +50,41 @@ static const mode_t PERMISSION_BITS = 0777U;
 
 static bool ignored_name(const struct p101_env *env, const char *name)
 {
-    int                      p101_expression_result_17;
-    int                      p101_expression_result_18;
-    int                      p101_expression_result_19;
-    int                      p101_expression_result_20;
-    int                      p101_call_result_21;
-    int                      p101_call_result_22;
-    int                      p101_call_result_23;
-    int                      p101_call_result_24;
-    int                      p101_call_result_1;
     static const char *const ignored[] = {".git", ".pytest_cache", "__pycache__", "build", "compile_commands.json", "coverage", "debug", "profile"};
     size_t                   index;
-    bool                     ignored_name_result;
+    bool                     result;
 
     P101_TRACE_SCOPE(env);
-    ignored_name_result = false;
+    result = false;
     for(index = 0U; index < sizeof(ignored) / sizeof(ignored[0]); index++)
     {
-        p101_call_result_1 = p101_strcmp(env, name, ignored[index]);
-        if(p101_call_result_1 == 0)
+        int comparison;
+
+        comparison = p101_strcmp(env, name, ignored[index]);
+        if(comparison == 0)
         {
-            ignored_name_result = true;
+            result = true;
             break;
         }
     }
-    p101_expression_result_17 = 0;
-    if(!ignored_name_result)
+    if(!result)
     {
-        p101_call_result_21 = p101_strncmp(env, name, "build-", sizeof("build-") - 1U);
-        if(p101_call_result_21 == 0)
+        static const char *const ignored_prefixes[]       = {"build-", "coverage-", "debug-", "profile-"};
+        static const size_t      ignored_prefix_lengths[] = {sizeof("build-") - 1U, sizeof("coverage-") - 1U, sizeof("debug-") - 1U, sizeof("profile-") - 1U};
+
+        for(index = 0U; index < sizeof(ignored_prefixes) / sizeof(ignored_prefixes[0]); index++)
         {
-            p101_expression_result_20 = 1;
-        }
-        else
-        {
-            p101_call_result_22 = p101_strncmp(env, name, "coverage-", sizeof("coverage-") - 1U);
-            if(p101_call_result_22 == 0)
+            int comparison;
+
+            comparison = p101_strncmp(env, name, ignored_prefixes[index], ignored_prefix_lengths[index]);
+            if(comparison == 0)
             {
-                p101_expression_result_20 = 1;
+                result = true;
+                break;
             }
-            else
-            {
-                p101_expression_result_20 = 0;
-            }
-        }
-        if(p101_expression_result_20)
-        {
-            p101_expression_result_19 = 1;
-        }
-        else
-        {
-            p101_call_result_23 = p101_strncmp(env, name, "debug-", sizeof("debug-") - 1U);
-            if(p101_call_result_23 == 0)
-            {
-                p101_expression_result_19 = 1;
-            }
-            else
-            {
-                p101_expression_result_19 = 0;
-            }
-        }
-        if(p101_expression_result_19)
-        {
-            p101_expression_result_18 = 1;
-        }
-        else
-        {
-            p101_call_result_24 = p101_strncmp(env, name, "profile-", sizeof("profile-") - 1U);
-            if(p101_call_result_24 == 0)
-            {
-                p101_expression_result_18 = 1;
-            }
-            else
-            {
-                p101_expression_result_18 = 0;
-            }
-        }
-        if(p101_expression_result_18)
-        {
-            p101_expression_result_17 = 1;
         }
     }
-    if(p101_expression_result_17)
-    {
-        ignored_name_result = true;
-    }
-    return ignored_name_result;
+    return result;
 }
 
 static bool copy_file(const struct p101_env *env, struct p101_error *err, const char *source, const char *destination, mode_t mode)
@@ -499,75 +448,57 @@ done:
 
 char *p101_mutation_rewrite_path(const struct p101_env *env, struct p101_error *err, const char *project, const char *copy, const char *value)
 {
-    int    p101_expression_result_43;
-    int    p101_expression_result_44;
-    int    p101_expression_result_45;
-    char  *p101_call_result_46;
-    int    p101_call_result_47;
-    int    p101_expression_result_48;
-    size_t p101_call_result_9;
-    size_t p101_call_result_10;
-    void  *p101_call_result_11;
     char   canonical_value[P101_MUTATION_PATH_SIZE];
     char  *rewritten;
     size_t project_length;
+    bool   value_is_in_project;
 
     P101_TRACE_SCOPE(env);
-    project_length = p101_strlen(env, project);
+    project_length      = p101_strlen(env, project);
+    value_is_in_project = false;
     /* P101_ERROR_OPTIONAL rationale: a path that cannot be canonicalized is left unchanged. */
-    p101_expression_result_45 = 0;
     if(value[0] == '/')
     {
-        p101_call_result_46 = p101_realpath(env, P101_ERROR_OPTIONAL, value, canonical_value);
-        if(p101_call_result_46 != NULL)
-        {
-            p101_expression_result_45 = 1;
-        }
-    }
-    p101_expression_result_44 = 0;
-    if(p101_expression_result_45)
-    {
-        p101_call_result_47 = p101_strncmp(env, canonical_value, project, project_length);
-        if(p101_call_result_47 == 0)
-        {
-            p101_expression_result_44 = 1;
-        }
-    }
-    p101_expression_result_43 = 0;
-    if(p101_expression_result_44)
-    {
-        if(canonical_value[project_length] == '/')
-        {
-            p101_expression_result_48 = 1;
-        }
-        else
-        {
-            if(canonical_value[project_length] == '\0')
-            {
-                p101_expression_result_48 = 1;
-            }
-            else
-            {
-                p101_expression_result_48 = 0;
-            }
-        }
-        if(p101_expression_result_48)
-        {
-            p101_expression_result_43 = 1;
-        }
-    }
-    if(p101_expression_result_43)
-    {
-        size_t length;
+        const char *canonicalized;
 
-        p101_call_result_9  = p101_strlen(env, copy);
-        p101_call_result_10 = p101_strlen(env, canonical_value + project_length);
-        length              = p101_call_result_9 + p101_call_result_10 + 1U;
-        p101_call_result_11 = p101_malloc(env, err, length);
-        rewritten           = (char *)p101_call_result_11;
+        canonicalized = p101_realpath(env, P101_ERROR_OPTIONAL, value, canonical_value);
+        if(canonicalized != NULL)
+        {
+            size_t canonical_length;
+
+            canonical_length = p101_strlen(env, canonical_value);
+            if(canonical_length >= project_length)
+            {
+                int comparison;
+
+                comparison = p101_strncmp(env, canonical_value, project, project_length);
+                if(comparison == 0 && (canonical_value[project_length] == '/' || canonical_value[project_length] == '\0'))
+                {
+                    value_is_in_project = true;
+                }
+            }
+        }
+    }
+    if(value_is_in_project)
+    {
+        const char *suffix;
+        size_t      copy_length;
+        size_t      suffix_length;
+        size_t      length;
+        void       *allocation;
+
+        suffix        = canonical_value + project_length;
+        copy_length   = p101_strlen(env, copy);
+        suffix_length = p101_strlen(env, suffix);
+        length        = copy_length + suffix_length + 1U;
+        allocation    = p101_malloc(env, err, length);
+        rewritten     = (char *)allocation;
         if(rewritten != NULL)
         {
-            p101_snprintf(env, err, rewritten, length, "%s%s", copy, canonical_value + project_length);
+            int write_status;
+
+            write_status = p101_snprintf(env, err, rewritten, length, "%s%s", copy, suffix);
+            (void)write_status;
         }
     }
     else
@@ -597,7 +528,7 @@ bool p101_mutation_apply_candidate(const struct p101_env *env, struct p101_error
     size_t      p101_call_result_64;
     int         p101_expression_result_65;
     bool        p101_call_result_66;
-    char       *p101_call_result_12;
+    const char *p101_call_result_12;
     int         p101_call_result_13;
     size_t      p101_call_result_14;
     size_t      p101_call_result_15;
