@@ -304,7 +304,7 @@ static size_t analysis_finding_count(const struct run_result *result)
 
 static bool analysis_summary_unavailable(const struct run_result *result)
 {
-    return (!result->resource_log_present || !result->resources.parsed || !result->resources.has_records || !result->analysis.parsed) != 0;
+    return (!result->resource_log_present || !result->resources.parsed || !result->analysis.parsed) != 0;
 }
 
 static int run_one_case(const struct p101_env *env, struct p101_error *err, const struct arguments *args, unsigned int fault_index, struct run_result *result)
@@ -431,12 +431,9 @@ static int run_p101_pipeline(const struct p101_env *env, struct p101_error *err,
     char   run_path[PATH_LEN];
     char   run_dir[PATH_LEN];
     char   observe_path[PATH_LEN];
-    char   analyze_path[PATH_LEN];
-    char   model_path[PATH_LEN];
+    char   run_subcommand[] = "run";
     char   output_option[]  = "-o";
     char   observe_option[] = "--observe-tool";
-    char   analyze_option[] = "--analyze-tool";
-    char   model_option[]   = "--model-tool";
     char   separator[]      = "--";
     size_t index;
     size_t command_index;
@@ -450,21 +447,14 @@ static int run_p101_pipeline(const struct p101_env *env, struct p101_error *err,
     run_dir[sizeof(run_dir) - 1U] = '\0';
     p101_strncpy(env, observe_path, args->p101_observe, sizeof(observe_path) - 1U);
     observe_path[sizeof(observe_path) - 1U] = '\0';
-    p101_strncpy(env, analyze_path, args->p101_analyze, sizeof(analyze_path) - 1U);
-    analyze_path[sizeof(analyze_path) - 1U] = '\0';
-    p101_strncpy(env, model_path, args->event_model, sizeof(model_path) - 1U);
-    model_path[sizeof(model_path) - 1U] = '\0';
 
     index              = 0;
     tool_argv[index++] = run_path;
+    tool_argv[index++] = run_subcommand;
     tool_argv[index++] = output_option;
     tool_argv[index++] = run_dir;
     tool_argv[index++] = observe_option;
     tool_argv[index++] = observe_path;
-    tool_argv[index++] = analyze_option;
-    tool_argv[index++] = analyze_path;
-    tool_argv[index++] = model_option;
-    tool_argv[index++] = model_path;
     tool_argv[index++] = separator;
 
     command_index = 0U;

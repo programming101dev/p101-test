@@ -21,7 +21,7 @@ fail p101 call #3
 ```
 
 Each injected run follows the same capture/model/policy pipeline as
-`scripts/runtime/p101-run.py`,
+`p101-inspect run`,
 so the same run produces:
 
 - a resource log;

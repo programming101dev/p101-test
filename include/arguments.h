@@ -20,8 +20,6 @@ struct arguments
     const char  *log_prefix;
     const char  *p101_run;
     const char  *p101_observe;
-    const char  *p101_analyze;
-    const char  *event_model;
     char *const *command_argv;
     unsigned int max_failures;
     int          fault_errno;

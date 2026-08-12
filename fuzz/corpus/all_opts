@@ -1,1 +1,1 @@
--v -n 20 -l resources.log -U p101-run.py -O inspect-capture -Y p101-analyze.py -B p101-event-model -- ./prog arg
+-v -n 20 -l resources.log -U p101-inspect -O inspect-capture -- ./prog arg

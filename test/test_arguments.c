@@ -101,13 +101,13 @@ static int inject_selected_failure(const struct p101_env *unused_env, const char
 
 static void test_parse_accepts_command_after_options(void)
 {
-    char            *argv[] = {"test-faults", "-n", "3", "-l", "walk", "-U", "p101-run.py", "-O", "inspect-capture", "-Y", "p101-analyze.py", "-B", "p101-event-model", "-E", "12", "-F", "p101_open", "--", "prog", "arg", NULL};
+    char            *argv[] = {"test-faults", "-n", "3", "-l", "walk", "-U", "p101-inspect", "-O", "inspect-capture", "-E", "12", "-F", "p101_open", "--", "prog", "arg", NULL};
     struct arguments args;
 
     reset_getopt();
     p101_error_path_walk_arguments_init(env, &args);
 
-    p101_error_path_walk_parse_arguments(env, error, 20, argv, &args);
+    p101_error_path_walk_parse_arguments(env, error, 16, argv, &args);
     p101_error_path_walk_check_arguments(env, error, &args);
     p101_error_path_walk_convert_arguments(env, error, &args);
 
@@ -115,10 +115,8 @@ static void test_parse_accepts_command_after_options(void)
     TEST_ASSERT_EQUAL_UINT(3U, args.max_failures);
     TEST_ASSERT_EQUAL_INT(12, args.fault_errno);
     TEST_ASSERT_EQUAL_STRING("walk", args.log_prefix);
-    TEST_ASSERT_EQUAL_STRING("p101-run.py", args.p101_run);
+    TEST_ASSERT_EQUAL_STRING("p101-inspect", args.p101_run);
     TEST_ASSERT_EQUAL_STRING("inspect-capture", args.p101_observe);
-    TEST_ASSERT_EQUAL_STRING("p101-analyze.py", args.p101_analyze);
-    TEST_ASSERT_EQUAL_STRING("p101-event-model", args.event_model);
     TEST_ASSERT_EQUAL_STRING("p101_open", args.fault_name);
     TEST_ASSERT_EQUAL_STRING("prog", args.command_argv[0]);
     TEST_ASSERT_EQUAL_STRING("arg", args.command_argv[1]);
@@ -189,7 +187,7 @@ static void test_argument_validation_covers_null_empty_modes_and_short_names(voi
     p101_error_path_walk_check_arguments(env, error, &args);
     TEST_ASSERT_TRUE(p101_error_has_error(error));
 
-    for(size_t index = 0U; index < 4U; index++)
+    for(size_t index = 0U; index < 2U; index++)
     {
         const char **field;
 
@@ -204,11 +202,8 @@ static void test_argument_validation_covers_null_empty_modes_and_short_names(voi
             case 1:
                 field = &args.p101_observe;
                 break;
-            case 2:
-                field = &args.p101_analyze;
-                break;
             default:
-                field = &args.event_model;
+                field = &args.p101_observe;
                 break;
         }
         *field = NULL;
@@ -226,11 +221,8 @@ static void test_argument_validation_covers_null_empty_modes_and_short_names(voi
             case 1:
                 args.p101_observe = "";
                 break;
-            case 2:
-                args.p101_analyze = "";
-                break;
             default:
-                args.event_model = "";
+                args.p101_observe = "";
                 break;
         }
         p101_error_path_walk_check_arguments(env, error, &args);
@@ -581,8 +573,6 @@ static void init_runner_arguments(struct arguments *args, char *const command[])
     p101_error_path_walk_arguments_init(env, args);
     args->p101_run     = "/usr/bin/true";
     args->p101_observe = "observe";
-    args->p101_analyze = "analyze";
-    args->event_model  = "model";
     args->log_prefix   = "/tmp/test-faults-unit";
     args->command_argv = command;
 }
@@ -614,7 +604,7 @@ static void test_runner_helpers_cover_status_resource_and_group_models(void)
     TEST_ASSERT_TRUE(p101_error_path_walk_test_analysis_summary_unavailable(&result));
     result.resources.parsed      = true;
     result.resources.has_records = false;
-    TEST_ASSERT_TRUE(p101_error_path_walk_test_analysis_summary_unavailable(&result));
+    TEST_ASSERT_FALSE(p101_error_path_walk_test_analysis_summary_unavailable(&result));
     result.resources.has_records = true;
     result.analysis.parsed       = false;
     TEST_ASSERT_TRUE(p101_error_path_walk_test_analysis_summary_unavailable(&result));

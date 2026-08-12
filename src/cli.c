@@ -21,8 +21,6 @@ void p101_error_path_walk_arguments_init(const struct p101_env *env, struct argu
     args->max_failures       = DEFAULT_MAX_FAILURES;
     args->p101_run           = DEFAULT_RUN_PATH;
     args->p101_observe       = DEFAULT_OBSERVE_PATH;
-    args->p101_analyze       = DEFAULT_ANALYZE_PATH;
-    args->event_model        = DEFAULT_MODEL_PATH;
     args->fault_errno        = EIO;
     args->fault_mode         = "error";
     args->fault_amount       = 1U;
@@ -67,7 +65,7 @@ void p101_error_path_walk_parse_arguments(const struct p101_env *env, struct p10
 
     for(;;)
     {
-        opt = p101_getopt(env, argc, argv, ":hvn:l:U:O:Y:B:E:F:M:A:R:");
+        opt = p101_getopt(env, argc, argv, ":hvn:l:U:O:E:F:M:A:R:");
         if(opt == -1)
         {
             break;
@@ -118,12 +116,6 @@ static void handle_option(const struct p101_env *env, struct p101_error *err, st
             break;
         case 'O':
             destination = &args->p101_observe;
-            break;
-        case 'Y':
-            destination = &args->p101_analyze;
-            break;
-        case 'B':
-            destination = &args->event_model;
             break;
         case 'E':
             destination = &args->fault_errno_str;
@@ -186,8 +178,6 @@ void p101_error_path_walk_check_arguments(const struct p101_env *env, struct p10
     bool                p101_call_result_7;
     bool                p101_call_result_3;
     bool                p101_call_result_4;
-    bool                p101_call_result_5;
-    bool                p101_call_result_6;
     P101_TRACE_SCOPE(env);
 
     if(args->command_argv == NULL || args->command_argv[0] == NULL)
@@ -205,7 +195,7 @@ void p101_error_path_walk_check_arguments(const struct p101_env *env, struct p10
     p101_call_result_3 = required_text_missing(args->p101_run);
     if(p101_call_result_3)
     {
-        P101_ERROR_RAISE_USER(err, "The p101-run path must not be empty.", ERR_USAGE);
+        P101_ERROR_RAISE_USER(err, "The p101-inspect path must not be empty.", ERR_USAGE);
         goto done;
     }
 
@@ -213,20 +203,6 @@ void p101_error_path_walk_check_arguments(const struct p101_env *env, struct p10
     if(p101_call_result_4)
     {
         P101_ERROR_RAISE_USER(err, "The inspect-capture path must not be empty.", ERR_USAGE);
-        goto done;
-    }
-
-    p101_call_result_5 = required_text_missing(args->p101_analyze);
-    if(p101_call_result_5)
-    {
-        P101_ERROR_RAISE_USER(err, "The p101-analyze path must not be empty.", ERR_USAGE);
-        goto done;
-    }
-
-    p101_call_result_6 = required_text_missing(args->event_model);
-    if(p101_call_result_6)
-    {
-        P101_ERROR_RAISE_USER(err, "The p101-event-model path must not be empty.", ERR_USAGE);
         goto done;
     }
 
@@ -346,21 +322,15 @@ void p101_error_path_walk_usage(const struct p101_env *env, struct p101_error *e
         p101_fprintf(env, err, stderr, "%s\n\n", message);
     }
 
-    p101_fprintf(env,
-                 err,
-                 stderr,
-                 "Usage: %s [-h] [-v] [-n <count>] [-l <prefix>] [-U <p101-run>] [-O <inspect-capture>] [-Y <p101-analyze>] [-B <p101-event-model>] [-E <errno>] [-F <name>] [-M <mode>] [-A <amount>] [-R <count>] -- <command> [args...]\n",
-                 program_name);
+    p101_fprintf(env, err, stderr, "Usage: %s [-h] [-v] [-n <count>] [-l <prefix>] [-U <p101-inspect>] [-O <inspect-capture>] [-E <errno>] [-F <name>] [-M <mode>] [-A <amount>] [-R <count>] -- <command> [args...]\n", program_name);
     p101_fputs(env, err, "Options:\n", stderr);
     p101_fputs(env, err, "  -h                      Display this help message and exit\n", stderr);
     p101_fputs(env, err, "  -v                      Enable verbose p101 tracing in the walker\n", stderr);
     p101_fputs(env, err, "  -n <count>              Maximum injected failures to try after the baseline\n", stderr);
     p101_fputs(env, err, "                          (default: 1024, stops early when no fault fires)\n", stderr);
     p101_fputs(env, err, "  -l <prefix>             Prefix for per-case capture and analysis directories\n", stderr);
-    p101_fputs(env, err, "  -U <p101-run>           Shared capture/analyze driver (default: PATH lookup)\n", stderr);
+    p101_fputs(env, err, "  -U <p101-inspect>       Shared native capture/analyze tool (default: PATH lookup)\n", stderr);
     p101_fputs(env, err, "  -O <inspect-capture>       inspect-capture executable (default: PATH lookup)\n", stderr);
-    p101_fputs(env, err, "  -Y <p101-analyze>       Shared policy-analysis driver (default: PATH lookup)\n", stderr);
-    p101_fputs(env, err, "  -B <p101-event-model>   Shared event-model builder (default: PATH lookup)\n", stderr);
     p101_fputs(env, err, "  -E <errno>              errno injected by failed wrappers (default: EIO)\n", stderr);
     p101_fputs(env, err, "  -F <name>               Exact public wrapper identity, e.g. p101_open\n", stderr);
     p101_fputs(env, err, "  -M <mode>               error, eintr, timeout, short, or uncertain (default: error)\n", stderr);

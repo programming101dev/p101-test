@@ -77,7 +77,7 @@ exit "${FAKE_PIPELINE_STATUS:-0}"
 EOF
 chmod +x "$work/fake-run"
 
-base=("$tool" -U "$work/fake-run" -O observe -Y analyze -B model -l "$work/walk")
+base=("$tool" -U "$work/fake-run" -O observe -l "$work/walk")
 
 expect_status 0 "$tool" --help
 expect_status 0 "$tool" -h
@@ -105,8 +105,6 @@ expect_status 2 "$tool" -R 0 -- true
 expect_status 2 "$tool" -l "" -- true
 expect_status 2 "$tool" -U "" -- true
 expect_status 2 "$tool" -O "" -- true
-expect_status 2 "$tool" -Y "" -- true
-expect_status 2 "$tool" -B "" -- true
 expect_status 2 "$tool" -F "" -- true
 expect_status 2 "$tool" -M bogus -- true
 expect_status 2 "$tool" -M short -- true

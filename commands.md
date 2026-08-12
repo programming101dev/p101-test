@@ -31,7 +31,7 @@ Program examples:
 | `test-faults -F p101_open -- ./prog config.txt` | Walk only the exact wrapper API identity |
 | `test-faults -E 24 -- ./prog config.txt` | Inject errno `24` instead of the default `EIO` |
 | `test-faults -O ../p101-inspect/inspect-capture -- ./prog` | Use the in-tree capture launcher |
-| `test-faults -U ../../scripts/runtime/p101-run.py -Y ../../scripts/runtime/p101-analyze.py -- ./prog` | Use the in-tree shared runtime drivers |
+| `test-faults -U ../p101-inspect/build-clang/p101-inspect -- ./prog` | Use the in-tree native inspection driver |
 | `test-faults -B ../../libraries/lib_tool_event/build-clang/p101-event-model -- ./prog` | Use an in-tree shared event-model build |
 
 The final summary groups injected runs by faulted wrapper name and resource

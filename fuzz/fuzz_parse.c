@@ -79,8 +79,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     args.max_failures = DEFAULT_MAX_FAILURES;
     args.p101_run     = DEFAULT_RUN_PATH;
     args.p101_observe = DEFAULT_OBSERVE_PATH;
-    args.p101_analyze = DEFAULT_ANALYZE_PATH;
-    args.event_model  = DEFAULT_MODEL_PATH;
     args.fault_errno  = EIO;
 
     p101_error_path_walk_parse_arguments(env, err, argc, argv, &args);
