@@ -16,7 +16,7 @@ set(_P101_INC_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../include" ${P101_PUBLIC_INCLUD
 set(_P101_LIB_DIRS ${P101_PUBLIC_LINK_DIRS_LIST} /usr/local/lib /usr/local/lib64 /opt/homebrew/lib /opt/local/lib)
 
 set(P101_LIBS
-        p101_error p101_env p101_record p101_tool_event p101_tool_support p101_c p101_c_facts
+        p101_error p101_env p101_json p101_record p101_tool_event p101_tool_support p101_c p101_c_facts
         p101_filesystem p101_io p101_process p101_time)
 set(_P101_RESOLVED "")
 foreach(_library IN LISTS P101_LIBS)
@@ -48,4 +48,6 @@ add_test(
         NAME mutation_check_cli
         COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/test_cli.sh"
                 "$<TARGET_FILE:p101_mutation_check_test_cli>"
-                "${CMAKE_C_COMPILER}")
+                "${CMAKE_C_COMPILER}"
+                "${CMAKE_OSX_SYSROOT}"
+                "${CMAKE_C_COMPILER_ARG1}")

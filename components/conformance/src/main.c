@@ -10,18 +10,30 @@
 
 enum
 {
-    MAX_APIS        = 2048,
-    MAX_CALLS       = 4096,
-    MAX_LINE        = 32768,
-    MAX_NAME        = 256,
-    MAX_USR         = 1024,
-    MAX_FAULTS      = 8192,
-    MAX_JSON        = 128 * 1024 * 1024,
-    API_FIELDS      = 5,
-    TEST_FIELDS     = 4,
-    CONTRACT_FIELDS = 4,
-    FAULT_FIELDS    = 11,
-    OUT_FIELDS      = 10
+    MAX_APIS                         = 2048,
+    MAX_CALLS                        = 4096,
+    MAX_LINE                         = 32768,
+    MAX_NAME                         = 256,
+    MAX_USR                          = 1024,
+    MAX_FAULTS                       = 8192,
+    MAX_JSON                         = 128 * 1024 * 1024,
+    PATH_SIZE                        = 4096,
+    MACRO_EXTRA                      = 16,
+    API_FIELDS                       = 5,
+    TEST_FIELDS                      = 4,
+    CONTRACT_FIELDS                  = 4,
+    FAULT_FIELDS                     = 11,
+    OUT_FIELDS                       = 10,
+    FAULT_LINUX_PLATFORM_COLUMN      = 4,
+    FAULT_MACOS_PLATFORM_COLUMN      = 5,
+    FAULT_FREEBSD_PLATFORM_COLUMN    = 6,
+    FAULT_LINUX_CONDITIONAL_COLUMN   = 8,
+    FAULT_MACOS_CONDITIONAL_COLUMN   = 9,
+    FAULT_FREEBSD_CONDITIONAL_COLUMN = 10,
+    OUTCOME_WRAPPER_COLUMN           = 5,
+    OUTCOME_DOMAIN_COLUMN            = 6,
+    OUTCOME_SYMBOL_COLUMN            = 7,
+    OUTCOME_STATUS_COLUMN            = 9
 };
 
 struct api_record
@@ -166,7 +178,14 @@ int main(int argc, char **argv)
     }
     if(written)
     {
-        status = valid ? EXIT_SUCCESS : EXIT_FAILURE;
+        if(valid)
+        {
+            status = EXIT_SUCCESS;
+        }
+        else
+        {
+            status = EXIT_FAILURE;
+        }
     }
 
 done:
@@ -366,7 +385,7 @@ static bool copy_text(const struct p101_env *env, struct p101_error *err, char *
 
 static bool load_api_manifest(const struct p101_env *env, struct p101_error *err, const char *repo, struct conformance *state)
 {
-    char   path[4096];
+    char   path[PATH_SIZE];
     char   line[MAX_LINE];
     char  *fields[API_FIELDS];
     FILE  *stream;
@@ -461,7 +480,7 @@ static struct api_record *find_api_name(const struct p101_env *env, struct confo
 
 static bool load_test_manifest(const struct p101_env *env, struct p101_error *err, const char *repo, struct conformance *state)
 {
-    char               path[4096];
+    char               path[PATH_SIZE];
     char               line[MAX_LINE];
     char              *fields[TEST_FIELDS];
     struct api_record *api;
@@ -523,7 +542,7 @@ static bool load_test_manifest(const struct p101_env *env, struct p101_error *er
 
 static bool load_conformance_manifest(const struct p101_env *env, struct p101_error *err, const char *repo, struct conformance *state)
 {
-    char               path[4096];
+    char               path[PATH_SIZE];
     char               line[MAX_LINE];
     char              *fields[CONTRACT_FIELDS];
     struct api_record *api;
@@ -536,7 +555,7 @@ static bool load_conformance_manifest(const struct p101_env *env, struct p101_er
     int                close_status;
 
     written = p101_snprintf(env, err, path, sizeof(path), "%s/test/conformance-manifest.tsv", repo);
-    loaded  = written >= 0 && (size_t)written < sizeof(path);
+    loaded  = (bool)(written >= 0 && (size_t)written < sizeof(path));
     stream  = NULL;
     if(loaded)
     {
@@ -559,7 +578,7 @@ static bool load_conformance_manifest(const struct p101_env *env, struct p101_er
             break;
         }
         api    = find_api(env, state, fields[1]);
-        loaded = api != NULL && !api->conformance_seen;
+        loaded = (bool)(api != NULL && !api->conformance_seen);
         if(!loaded)
         {
             P101_ERROR_RAISE_USER(err, "conformance manifest identity mismatch", EINVAL);
@@ -619,7 +638,7 @@ static bool list_contains(const struct p101_env *env, const char *list, const ch
 static bool macro_present(const struct p101_env *env, struct p101_error *err, const char *path, const char *symbol)
 {
     char   line[MAX_LINE];
-    char   expected[MAX_NAME + 16U];
+    char   expected[MAX_NAME + MACRO_EXTRA];
     FILE  *stream;
     size_t expected_length;
     bool   found;
@@ -658,7 +677,7 @@ static bool macro_present(const struct p101_env *env, struct p101_error *err, co
 
 static bool load_fault_manifest(const struct p101_env *env, struct p101_error *err, const struct arguments *arguments, struct conformance *state)
 {
-    char               path[4096];
+    char               path[PATH_SIZE];
     char               line[MAX_LINE];
     char               faults[MAX_LINE];
     char              *fields[FAULT_FIELDS];
@@ -679,19 +698,19 @@ static bool load_fault_manifest(const struct p101_env *env, struct p101_error *e
     int                close_status;
 
     comparison         = p101_strcmp(env, arguments->platform, "linux");
-    platform_column    = 4U;
-    conditional_column = 8U;
+    platform_column    = FAULT_LINUX_PLATFORM_COLUMN;
+    conditional_column = FAULT_LINUX_CONDITIONAL_COLUMN;
     if(comparison != 0)
     {
         comparison         = p101_strcmp(env, arguments->platform, "macos");
-        platform_column    = 5U;
-        conditional_column = 9U;
+        platform_column    = FAULT_MACOS_PLATFORM_COLUMN;
+        conditional_column = FAULT_MACOS_CONDITIONAL_COLUMN;
     }
     if(comparison != 0)
     {
         comparison         = p101_strcmp(env, arguments->platform, "freebsd");
-        platform_column    = 6U;
-        conditional_column = 10U;
+        platform_column    = FAULT_FREEBSD_PLATFORM_COLUMN;
+        conditional_column = FAULT_FREEBSD_CONDITIONAL_COLUMN;
     }
     if(comparison != 0)
     {
@@ -999,7 +1018,7 @@ static bool load_model(const struct p101_env *env, struct p101_error *err, const
             if(found)
             {
                 comparison     = p101_strcmp(env, value, "-");
-                api->arguments = value[0] != '\0' && comparison != 0;
+                api->arguments = (bool)(value[0] != '\0' && comparison != 0);
             }
         }
         comparison = p101_strcmp(env, kind, "call-exit");
@@ -1010,7 +1029,7 @@ static bool load_model(const struct p101_env *env, struct p101_error *err, const
             if(found)
             {
                 comparison  = p101_strcmp(env, value, "-");
-                api->result = value[0] != '\0' && comparison != 0;
+                api->result = (bool)(value[0] != '\0' && comparison != 0);
             }
         }
     }
@@ -1076,16 +1095,16 @@ static bool load_outcomes(const struct p101_env *env, struct p101_error *err, co
             loaded = false;
             break;
         }
-        fault = find_fault(env, state, fields[5], fields[6], fields[7]);
+        fault = find_fault(env, state, fields[OUTCOME_WRAPPER_COLUMN], fields[OUTCOME_DOMAIN_COLUMN], fields[OUTCOME_SYMBOL_COLUMN]);
         if(fault == NULL || fault->observed)
         {
-            finding(env, arguments->outcomes, arguments->library, "unexpected or duplicate fault outcome", fields[5], state);
+            finding(env, arguments->outcomes, arguments->library, "unexpected or duplicate fault outcome", fields[OUTCOME_WRAPPER_COLUMN], state);
             continue;
         }
-        comparison = p101_strcmp(env, fields[9], "PASS");
+        comparison = p101_strcmp(env, fields[OUTCOME_STATUS_COLUMN], "PASS");
         if(comparison != 0)
         {
-            finding(env, arguments->outcomes, arguments->library, "fault outcome failed", fields[5], state);
+            finding(env, arguments->outcomes, arguments->library, "fault outcome failed", fields[OUTCOME_WRAPPER_COLUMN], state);
         }
         fault->observed = true;
         state->fault_outcomes_observed++;

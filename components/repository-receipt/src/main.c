@@ -15,12 +15,13 @@ enum
     MAX_PATH         = 4096,
     MAX_LINE         = 16384,
     RESULT_FIELDS    = 6,
+    INTEGER_BASE     = 10,
     FIELD_REPOSITORY = 0,
-    FIELD_UNIT,
-    FIELD_FUZZ,
-    FIELD_TEST_LOG,
-    FIELD_FUZZ_LOG,
-    FIELD_DURATION
+    FIELD_UNIT       = 1,
+    FIELD_FUZZ       = 2,
+    FIELD_TEST_LOG   = 3,
+    FIELD_FUZZ_LOG   = 4,
+    FIELD_DURATION   = 5
 };
 
 struct repository_result
@@ -101,7 +102,14 @@ int main(int argc, char **argv)
     written = write_receipt(env, err, output_path, records, record_count, passed);
     if(written)
     {
-        status = passed ? EXIT_SUCCESS : EXIT_FAILURE;
+        if(passed)
+        {
+            status = EXIT_SUCCESS;
+        }
+        else
+        {
+            status = EXIT_FAILURE;
+        }
     }
 
 done:
@@ -240,6 +248,7 @@ static bool load_result(const struct p101_env *env, struct p101_error *err, cons
     size_t field_count;
     long   duration;
     bool   loaded;
+    bool   copied;
     int    close_status;
 
     loaded = false;
@@ -293,17 +302,21 @@ static bool load_result(const struct p101_env *env, struct p101_error *err, cons
         goto close;
     }
     fields[FIELD_DURATION][p101_strcspn(env, fields[FIELD_DURATION], "\r\n")] = '\0';
-    duration                                                                  = p101_strtol(env, err, fields[FIELD_DURATION], &end, 10);
+    duration                                                                  = p101_strtol(env, err, fields[FIELD_DURATION], &end, INTEGER_BASE);
     if(end == fields[FIELD_DURATION] || *end != '\0' || duration < 0)
     {
         P101_ERROR_RAISE_USER(err, "repository result has an invalid duration", EINVAL);
         goto close;
     }
     loaded                   = copy_field(env, err, record->repository, sizeof(record->repository), fields[FIELD_REPOSITORY]);
-    loaded                   = copy_field(env, err, record->unit, sizeof(record->unit), fields[FIELD_UNIT]) && loaded;
-    loaded                   = copy_field(env, err, record->fuzz, sizeof(record->fuzz), fields[FIELD_FUZZ]) && loaded;
-    loaded                   = copy_field(env, err, record->test_log, sizeof(record->test_log), fields[FIELD_TEST_LOG]) && loaded;
-    loaded                   = copy_field(env, err, record->fuzz_log, sizeof(record->fuzz_log), fields[FIELD_FUZZ_LOG]) && loaded;
+    copied                   = copy_field(env, err, record->unit, sizeof(record->unit), fields[FIELD_UNIT]);
+    loaded                   = (bool)(copied && loaded);
+    copied                   = copy_field(env, err, record->fuzz, sizeof(record->fuzz), fields[FIELD_FUZZ]);
+    loaded                   = (bool)(copied && loaded);
+    copied                   = copy_field(env, err, record->test_log, sizeof(record->test_log), fields[FIELD_TEST_LOG]);
+    loaded                   = (bool)(copied && loaded);
+    copied                   = copy_field(env, err, record->fuzz_log, sizeof(record->fuzz_log), fields[FIELD_FUZZ_LOG]);
+    loaded                   = (bool)(copied && loaded);
     record->duration_seconds = (size_t)duration;
 
 close:
@@ -319,11 +332,12 @@ done:
 
 static bool write_receipt(const struct p101_env *env, struct p101_error *err, const char *path, const struct repository_result records[MAX_RECORDS], size_t record_count, bool passed)
 {
-    FILE  *stream;
-    size_t index;
-    bool   written;
-    int    write_status;
-    int    close_status;
+    FILE       *stream;
+    size_t      index;
+    const char *passed_text;
+    bool        written;
+    int         write_status;
+    int         close_status;
 
     written = false;
     stream  = p101_fopen(env, err, path, "w");
@@ -331,7 +345,15 @@ static bool write_receipt(const struct p101_env *env, struct p101_error *err, co
     {
         goto done;
     }
-    write_status = p101_fprintf(env, err, stream, "{\n  \"schema\": \"p101-repository-test-receipt-v1\",\n  \"passed\": %s,\n  \"repositories\": [", passed ? "true" : "false");
+    if(passed)
+    {
+        passed_text = "true";
+    }
+    else
+    {
+        passed_text = "false";
+    }
+    write_status = p101_fprintf(env, err, stream, "{\n  \"schema\": \"p101-repository-test-receipt-v1\",\n  \"passed\": %s,\n  \"repositories\": [", passed_text);
     if(write_status < 0)
     {
         goto close;
