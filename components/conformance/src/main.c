@@ -205,13 +205,14 @@ done:
 static bool parse_arguments(const struct p101_env *env, struct p101_error *err, int argc, char **argv, struct arguments *arguments)
 {
     const char **destination;
-    int          comparison;
     int          index;
     bool         parsed;
 
     parsed = true;
     for(index = 1; index < argc && parsed; index++)
     {
+        int comparison;
+
         comparison = p101_strcmp(env, argv[index], "--help");
         if(comparison == 0)
         {
@@ -444,11 +445,12 @@ static struct api_record *find_api(const struct p101_env *env, struct conformanc
 {
     struct api_record *record;
     size_t             index;
-    int                comparison;
 
     record = NULL;
     for(index = 0U; index < state->api_count; index++)
     {
+        int comparison;
+
         comparison = p101_strcmp(env, state->apis[index].usr, usr);
         if(comparison == 0)
         {
@@ -463,11 +465,12 @@ static struct api_record *find_api_name(const struct p101_env *env, struct confo
 {
     struct api_record *record;
     size_t             index;
-    int                comparison;
 
     record = NULL;
     for(index = 0U; index < state->api_count; index++)
     {
+        int comparison;
+
         comparison = p101_strcmp(env, state->apis[index].name, name);
         if(comparison == 0)
         {
@@ -552,7 +555,6 @@ static bool load_conformance_manifest(const struct p101_env *env, struct p101_er
     bool               loaded;
     int                written;
     int                comparison;
-    int                close_status;
 
     written = p101_snprintf(env, err, path, sizeof(path), "%s/test/conformance-manifest.tsv", repo);
     loaded  = (bool)(written >= 0 && (size_t)written < sizeof(path));
@@ -592,6 +594,8 @@ static bool load_conformance_manifest(const struct p101_env *env, struct p101_er
     }
     if(stream != NULL)
     {
+        int close_status;
+
         close_status = p101_fclose(env, err, stream);
         if(close_status != 0)
         {
@@ -604,8 +608,6 @@ static bool load_conformance_manifest(const struct p101_env *env, struct p101_er
 static bool list_contains(const struct p101_env *env, const char *list, const char *value)
 {
     const char *start;
-    const char *end;
-    size_t      length;
     size_t      value_length;
     int         comparison;
     bool        found;
@@ -615,6 +617,9 @@ static bool list_contains(const struct p101_env *env, const char *list, const ch
     found        = false;
     while(*start != '\0')
     {
+        const char *end;
+        size_t      length;
+
         end = start;
         while(*end != '\0' && *end != ',')
         {
@@ -643,7 +648,6 @@ static bool macro_present(const struct p101_env *env, struct p101_error *err, co
     size_t expected_length;
     bool   found;
     int    written;
-    int    comparison;
     int    close_status;
 
     written = p101_snprintf(env, err, expected, sizeof(expected), "#define %s", symbol);
@@ -660,6 +664,8 @@ static bool macro_present(const struct p101_env *env, struct p101_error *err, co
     found = false;
     while(p101_fgets(env, err, line, sizeof(line), stream) != NULL)
     {
+        int comparison;
+
         comparison = p101_strncmp(env, line, expected, expected_length);
         if(comparison == 0 && (line[expected_length] == ' ' || line[expected_length] == '\t' || line[expected_length] == '\n'))
         {
@@ -677,25 +683,25 @@ static bool macro_present(const struct p101_env *env, struct p101_error *err, co
 
 static bool load_fault_manifest(const struct p101_env *env, struct p101_error *err, const struct arguments *arguments, struct conformance *state)
 {
-    char               path[PATH_SIZE];
-    char               line[MAX_LINE];
-    char               faults[MAX_LINE];
-    char              *fields[FAULT_FIELDS];
-    char              *cursor;
-    char              *end;
-    const char        *symbol;
-    struct api_record *api;
-    FILE              *stream;
-    size_t             field_count;
-    size_t             platform_column;
-    size_t             conditional_column;
-    bool               conditional;
-    bool               available;
-    bool               loaded;
-    bool               first;
-    int                comparison;
-    int                written;
-    int                close_status;
+    char                     path[PATH_SIZE];
+    char                     line[MAX_LINE];
+    char                     faults[MAX_LINE];
+    char                    *fields[FAULT_FIELDS];
+    char                    *cursor;
+    char                    *end;
+    const char              *symbol;
+    const struct api_record *api;
+    FILE                    *stream;
+    size_t                   field_count;
+    size_t                   platform_column;
+    size_t                   conditional_column;
+    bool                     conditional;
+    bool                     available;
+    bool                     loaded;
+    bool                     first;
+    int                      comparison;
+    int                      written;
+    int                      close_status;
 
     comparison         = p101_strcmp(env, arguments->platform, "linux");
     platform_column    = FAULT_LINUX_PLATFORM_COLUMN;
@@ -836,11 +842,12 @@ static bool token_boolean(const struct p101_env *env, const struct p101_json *do
 {
     size_t token;
     bool   found;
-    bool   equal;
 
     found = p101_json_object_get(document, object, key, &token);
     if(found)
     {
+        bool equal;
+
         equal  = p101_json_token_equals(document, token, "true");
         *value = equal;
     }
@@ -1043,13 +1050,14 @@ static struct expected_fault *find_fault(const struct p101_env *env, struct conf
 {
     struct expected_fault *fault;
     size_t                 index;
-    int                    wrapper_comparison;
-    int                    domain_comparison;
-    int                    symbol_comparison;
 
     fault = NULL;
     for(index = 0U; index < state->fault_count; index++)
     {
+        int wrapper_comparison;
+        int domain_comparison;
+        int symbol_comparison;
+
         wrapper_comparison = p101_strcmp(env, state->faults[index].wrapper, wrapper);
         domain_comparison  = p101_strcmp(env, state->faults[index].domain, domain);
         symbol_comparison  = p101_strcmp(env, state->faults[index].symbol, symbol);
@@ -1064,14 +1072,11 @@ static struct expected_fault *find_fault(const struct p101_env *env, struct conf
 
 static bool load_outcomes(const struct p101_env *env, struct p101_error *err, const struct arguments *arguments, struct conformance *state)
 {
-    char                   line[MAX_LINE];
-    char                  *fields[OUT_FIELDS];
-    struct expected_fault *fault;
-    FILE                  *stream;
-    size_t                 field_count;
-    bool                   loaded;
-    int                    comparison;
-    int                    close_status;
+    char  line[MAX_LINE];
+    char *fields[OUT_FIELDS];
+    FILE *stream;
+    bool  loaded;
+    int   close_status;
 
     stream = p101_fopen(env, err, arguments->outcomes, "r");
     if(stream == NULL)
@@ -1081,6 +1086,10 @@ static bool load_outcomes(const struct p101_env *env, struct p101_error *err, co
     loaded = true;
     while(p101_fgets(env, err, line, sizeof(line), stream) != NULL)
     {
+        struct expected_fault *fault;
+        size_t                 field_count;
+        int                    comparison;
+
         field_count = split_fields(line, fields, OUT_FIELDS);
         if(field_count != OUT_FIELDS)
         {

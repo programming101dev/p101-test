@@ -133,13 +133,14 @@ static void usage(const struct p101_env *env, struct p101_error *err, const char
 static bool parse_arguments(const struct p101_env *env, struct p101_error *err, int argc, char **argv, const char **results_path, const char **output_path, bool *help)
 {
     int  index;
-    int  comparison;
     bool parsed;
 
     *help  = false;
     parsed = true;
     for(index = 1; index < argc && parsed; index++)
     {
+        int comparison;
+
         comparison = p101_strcmp(env, argv[index], "-h");
         if(comparison != 0)
         {
@@ -412,7 +413,6 @@ static bool has_suffix(const struct p101_env *env, const char *text, const char 
 {
     size_t text_length;
     size_t suffix_length;
-    int    comparison;
     bool   matches;
 
     text_length   = p101_strlen(env, text);
@@ -420,6 +420,8 @@ static bool has_suffix(const struct p101_env *env, const char *text, const char 
     matches       = text_length >= suffix_length;
     if(matches)
     {
+        int comparison;
+
         comparison = p101_strcmp(env, text + text_length - suffix_length, suffix);
         matches    = comparison == 0;
     }
@@ -430,15 +432,17 @@ static void sort_paths(const struct p101_env *env, char paths[MAX_RECORDS][MAX_P
 {
     char   temporary[MAX_PATH];
     size_t index;
-    size_t cursor;
-    int    comparison;
 
     for(index = 1U; index < count; index++)
     {
+        size_t cursor;
+
         p101_memcpy(env, temporary, paths[index], sizeof(temporary));
         cursor = index;
         while(cursor > 0U)
         {
+            int comparison;
+
             comparison = p101_strcmp(env, paths[cursor - 1U], temporary);
             if(comparison <= 0)
             {
