@@ -23,6 +23,7 @@
 #include <p101_io/p101_unistd.h>
 #include <p101_io/sys/p101_select.h>
 #include <p101_io/sys/p101_uio.h>
+#include <p101_json/json.h>
 #include <p101_process/p101_sched.h>
 #include <p101_process/p101_setjmp.h>
 #include <p101_process/p101_signal.h>
@@ -33,9 +34,8 @@
 #include <p101_process/sys/p101_resource.h>
 #include <p101_process/sys/p101_times.h>
 #include <p101_process/sys/p101_wait.h>
-#include <p101_record/record.h>
 #include <p101_time/p101_time.h>
-#include <p101_tool_event/report.h>
+#include <p101_tool_support/report.h>
 #include <signal.h>
 #include <stdint.h>
 #include <sys/stat.h>
@@ -52,7 +52,7 @@ static void json_string(const struct p101_env *env, struct p101_error *err, FILE
 {
     int p101_call_result_1;
     P101_TRACE_SCOPE(env);
-    p101_call_result_1 = p101_record_write_json_string(stream, text == NULL ? "" : text);
+    p101_call_result_1 = p101_json_write_string(stream, text == NULL ? "" : text);
     if(p101_call_result_1 != 0)
     {
         P101_ERROR_RAISE_ERRNO(err, errno == 0 ? EIO : errno);
