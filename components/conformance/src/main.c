@@ -683,7 +683,7 @@ static bool load_fault_manifest(const struct p101_env *env, struct p101_error *e
     char              *fields[FAULT_FIELDS];
     char              *cursor;
     char              *end;
-    char              *symbol;
+    const char        *symbol;
     struct api_record *api;
     FILE              *stream;
     size_t             field_count;
