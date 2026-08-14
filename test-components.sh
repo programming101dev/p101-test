@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Additional component suite for the consolidated p101-test repository.
+# This file is sourced after test.sh establishes the shared test variables.
+# shellcheck disable=SC2154
 
 if [ -n "$test_cache_root" ]; then
   component_test_bd="$test_cache_root/components/mutation/build-$sfx"
