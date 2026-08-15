@@ -1,24 +1,24 @@
 # Commands
 
 Quick reference for `test-faults`. Every script also supports `--help`.
-Run `./change-compiler.sh -c <compiler>` once before building.
+Run `cmake -S . -B build -DCMAKE_C_COMPILER=<compiler> -DP101_BUILD_LEVEL=1` once before building.
 
 | Command | What it does |
 | --- | --- |
-| `./change-compiler.sh -c <cc>` | Configure the build with a compiler (also `./change-compiler.sh <cc>`). `--help` lists detected compilers. |
-| `./change-compiler.sh -c <cc> -s address,undefined` | Configure with specific sanitizers |
-| `./change-compiler.sh -c <cc> --coverage` | Configure an instrumented build for coverage (gcov) |
-| `./build.sh` | Strict analysis build: format-check, clang-tidy, cppcheck, static analyzer, `-Werror`, sanitizers. `-q` = quiet |
-| `./build.sh -f` | Auto-fix in place: clang-tidy `--fix` + clang-format |
-| `./build.sh -C` | Format check only, no build (hook-friendly); non-zero if unclean |
-| `./check.sh` | **The gate:** format + strict build + tests + fuzz smoke -> one PASS/FAIL. `--cov <pct>` adds a coverage gate |
-| `./test.sh` | Build & run the Unity test suite (ctest) |
-| `./test-all.sh` | Run the tests across every supported compiler |
-| `./fuzz.sh` | Run the libFuzzer target (coverage-guided + sanitizers); PASS/FAIL. `-t <secs>` sets the time budget |
-| `./coverage-report.sh` | HTML coverage report. `--report-only` skips the run; `--min <pct>` fails under a threshold |
-| `./report.sh coverage` \| `profile` | One entry point for the coverage / profiling reports |
-| `./doctor.sh` | Report what actually works on this machine for this project |
-| `./clean.sh` | Remove `build-` / `coverage-` / `profile-` output (`-n` previews) |
+| `cmake -S . -B build -DCMAKE_C_COMPILER=<cc> -DP101_BUILD_LEVEL=1` | Configure the build with a compiler (also `set CMAKE_C_COMPILER=<cc>`). `--help` lists detected compilers. |
+| `cmake -S . -B build -DCMAKE_C_COMPILER=<cc> -DP101_BUILD_LEVEL=1 -s address,undefined` | Configure with specific sanitizers |
+| `cmake -S . -B build -DCMAKE_C_COMPILER=<cc> -DP101_BUILD_LEVEL=1 --coverage` | Configure an instrumented build for coverage (gcov) |
+| `cmake --build build` | Strict analysis build: format-check, clang-tidy, cppcheck, static analyzer, `-Werror`, sanitizers. `-q` = quiet |
+| `cmake --build build --target format` | Auto-fix in place: clang-tidy `--fix` + clang-format |
+| `clang-format --dry-run --Werror -style=file <sources>` | Format check only, no build (hook-friendly); non-zero if unclean |
+| `cmake -S . -B build -DP101_BUILD_LEVEL=3 && cmake --build build` | **The gate:** format + strict build + tests + fuzz smoke -> one PASS/FAIL. `--cov <pct>` adds a coverage gate |
+| `cmake -S . -B build -DP101_BUILD_LEVEL=2 && cmake --build build` | Build & run the Unity test suite (ctest) |
+| `../../scripts/update-all.sh --level 2` | Run the tests across every supported compiler |
+| `configure and run the fuzz/ CMake project` | Run the libFuzzer target (coverage-guided + sanitizers); PASS/FAIL. `-t <secs>` sets the time budget |
+| `configure with -DP101_COVERAGE_MODE=ON and run gcovr` | HTML coverage report. `--report-only` skips the run; `--min <pct>` fails under a threshold |
+| `configure with -DP101_COVERAGE_MODE=ON and run gcovr` \| `profile` | One entry point for the coverage / profiling reports |
+| `cmake -S . -B build` | Report what actually works on this machine for this project |
+| `cmake --build build --target clean` | Remove `build-` / `coverage-` / `profile-` output (`-n` previews) |
 | `./copy-template.sh <dir>` | Start a new project from this template |
 
 Program examples:
@@ -37,5 +37,5 @@ Program examples:
 The final summary groups injected runs by faulted wrapper name and resource
 finding count.
 
-Less common: `./build-all.sh` (build with every compiler), `./check-compilers.sh`
-(detect installed compilers), `./check-env.sh` (verify required tools).
+Less common: `../../scripts/update-all.sh --level 1` (build with every compiler), `cmake -S . -B build`
+(detect installed compilers), `cmake -S . -B build` (verify required tools).

@@ -13,7 +13,7 @@ never edited, and candidate discovery no longer launches a Python policy tool.
     ./build-clang/test-mutation \
         --compile-db build-clang/compile_commands.json \
         --max-mutants 50 \
-        . -- ./test.sh
+        . -- cmake -S . -B build -DP101_BUILD_LEVEL=2 && cmake --build build
 
 List candidates without running tests:
 
@@ -65,5 +65,5 @@ FreeBSD.
 
 ## Evidence
 
-    ./test.sh
-    ./check.sh
+    cmake -S . -B build -DP101_BUILD_LEVEL=2 && cmake --build build
+    cmake -S . -B build -DP101_BUILD_LEVEL=3 && cmake --build build
