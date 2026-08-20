@@ -25,12 +25,13 @@ set(BSD_STANDARD_FLAGS
 )
 
 # Define targets
-set(EXECUTABLE_TARGETS test_faults test_mutation test_repository_receipt test_wrapper_conformance)
+set(EXECUTABLE_TARGETS test_faults test_mutation test_repository_receipt test_wrapper_conformance test_command_contract)
 set(LIBRARY_TARGETS "")
 set(test_faults_OUTPUT_NAME test-faults)
 set(test_mutation_OUTPUT_NAME test-mutation)
 set(test_repository_receipt_OUTPUT_NAME test-repository-receipt)
 set(test_wrapper_conformance_OUTPUT_NAME test-wrapper-conformance)
+set(test_command_contract_OUTPUT_NAME test-command-contract)
 
 set(test_faults_SOURCES
         src/cli.c
@@ -58,6 +59,10 @@ set(test_wrapper_conformance_SOURCES
         components/conformance/src/main.c
 )
 
+set(test_command_contract_SOURCES
+        components/command-contract/src/main.c
+)
+
 set(test_faults_HEADERS
         include/arguments.h
         include/cli.h
@@ -76,6 +81,7 @@ set(test_mutation_HEADERS
 
 set(test_repository_receipt_HEADERS)
 set(test_wrapper_conformance_HEADERS)
+set(test_command_contract_HEADERS)
 
 set(test_faults_LINK_LIBRARIES
         p101_error
@@ -126,4 +132,18 @@ set(test_wrapper_conformance_LINK_LIBRARIES
         p101_tool_support
         p101_c
         p101_io
+)
+
+set(test_command_contract_LINK_LIBRARIES
+        p101_error
+        p101_env
+        p101_json
+        p101_record
+        p101_tool_support
+        p101_c
+        p101_filesystem
+        p101_process
+        p101_convert
+        p101_subprocess
+        p101_time
 )

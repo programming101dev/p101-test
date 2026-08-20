@@ -16,12 +16,17 @@ if (P101_TEST_COVERAGE)
     set(_COV --coverage)
 endif ()
 
-set(P101_LIBS p101_error p101_env p101_record p101_tool_event p101_tool_support p101_c p101_cli p101_filesystem p101_io p101_process p101_convert p101_subprocess)
+set(P101_LIBS p101_error p101_env p101_json p101_record p101_tool_event p101_tool_support p101_c p101_cli p101_filesystem p101_io p101_process p101_convert p101_subprocess p101_time)
 set(P101_PUBLIC_INCLUDE_DIRS "" CACHE STRING "Extra p101 include dirs")
 set(P101_PUBLIC_LINK_DIRS "" CACHE STRING "Extra p101 link dirs")
 separate_arguments(P101_PUBLIC_INCLUDE_DIRS_LIST NATIVE_COMMAND "${P101_PUBLIC_INCLUDE_DIRS}")
 separate_arguments(P101_PUBLIC_LINK_DIRS_LIST NATIVE_COMMAND "${P101_PUBLIC_LINK_DIRS}")
-set(_P101_INC_DIRS ${P101_PUBLIC_INCLUDE_DIRS_LIST} /usr/local/include /opt/homebrew/include /opt/local/include)
+set(_P101_INC_DIRS
+    ${P101_PUBLIC_INCLUDE_DIRS_LIST}
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../libraries/lib_tool_support/include"
+    /usr/local/include
+    /opt/homebrew/include
+    /opt/local/include)
 set(_P101_LIB_DIRS ${P101_PUBLIC_LINK_DIRS_LIST} /usr/local/lib /usr/local/lib64 /opt/homebrew/lib /opt/local/lib)
 
 set(_P101_RESOLVED "")
@@ -65,3 +70,15 @@ target_link_libraries(p101_error_path_walk_coverage_cli PRIVATE ${_P101_RESOLVED
 target_compile_options(p101_error_path_walk_coverage_cli PRIVATE ${_COV})
 target_link_options(p101_error_path_walk_coverage_cli PRIVATE ${_COV})
 add_test(NAME test_cli COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/test_cli.sh" "$<TARGET_FILE:p101_error_path_walk_coverage_cli>")
+
+add_executable(p101_command_contract_under_test
+    ../components/command-contract/src/main.c
+    ../../../libraries/lib_tool_support/src/diagnostic.c
+    ../../../libraries/lib_tool_support/src/lesson_catalog.c)
+target_include_directories(p101_command_contract_under_test PRIVATE ${_P101_INC_DIRS})
+target_link_libraries(p101_command_contract_under_test PRIVATE ${_P101_RESOLVED} m)
+target_compile_options(p101_command_contract_under_test PRIVATE ${_COV})
+target_link_options(p101_command_contract_under_test PRIVATE ${_COV})
+add_test(NAME test_command_contract
+        COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/test_command_contract.sh"
+                "$<TARGET_FILE:p101_command_contract_under_test>")
