@@ -1,6 +1,6 @@
 set(PROJECT_NAME "p101-test")
 set(PROJECT_VERSION "2.0.0")
-set(PROJECT_DESCRIPTION "Programming 101 executable fault and mutation test engines")
+set(PROJECT_DESCRIPTION "Programming 101 executable fault, mutation, and corpus test engines")
 set(PROJECT_LANGUAGE "C")
 
 set(CMAKE_C_STANDARD 17)
@@ -113,6 +113,7 @@ set(test_repository_receipt_LINK_LIBRARIES
         p101_env
         p101_json
         p101_record
+        p101_tool_support
         p101_c
         p101_filesystem
 )
@@ -122,6 +123,7 @@ set(test_wrapper_conformance_LINK_LIBRARIES
         p101_env
         p101_record
         p101_json
+        p101_tool_support
         p101_c
         p101_io
 )

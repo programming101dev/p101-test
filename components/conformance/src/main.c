@@ -4,6 +4,7 @@
 #include <p101_c/p101_string.h>
 #include <p101_io/p101_stdio.h>
 #include <p101_json/json.h>
+#include <p101_tool_support/diagnostic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,17 +110,18 @@ static bool                   copy_text(const struct p101_env *env, struct p101_
 
 int main(int argc, char **argv)
 {
-    struct arguments    arguments;
-    struct conformance *state;
-    struct p101_error  *err;
-    struct p101_env    *env;
-    const char         *message;
-    bool                parsed;
-    bool                loaded;
-    bool                valid;
-    bool                written;
-    bool                has_error;
-    int                 status;
+    struct arguments            arguments;
+    struct conformance         *state;
+    struct p101_error          *err;
+    struct p101_env            *env;
+    struct p101_tool_diagnostic diagnostic;
+    const char                 *message;
+    bool                        parsed;
+    bool                        loaded;
+    bool                        valid;
+    bool                        written;
+    bool                        has_error;
+    int                         status;
 
     state     = NULL;
     arguments = (struct arguments){.library = NULL, .repo = NULL, .instrumentation = NULL, .model = NULL, .outcomes = NULL, .platform = NULL, .macros = NULL, .receipt = NULL, .help = false};
@@ -193,7 +195,11 @@ done:
     if(has_error)
     {
         message = p101_error_get_message(err);
-        p101_fprintf(env, P101_ERROR_OPTIONAL, stderr, "%s:1:1: error: %s [P101-TEST-CONFORMANCE-001]\n", argv[0], message);
+        status  = p101_tool_diagnostic_initialize_id(&diagnostic, "P101-TEST-CONFORMANCE-001", P101_TOOL_DIAGNOSTIC_ERROR, argv[0], 1U, 1U, "main", message);
+        if(status == 0)
+        {
+            status = p101_tool_diagnostic_write(stderr, P101_TOOL_DIAGNOSTIC_TEXT, &diagnostic);
+        }
         status = 2;
     }
     p101_free(env, state);
@@ -1128,7 +1134,22 @@ static bool load_outcomes(const struct p101_env *env, struct p101_error *err, co
 
 static void finding(const struct p101_env *env, const char *path, const char *library, const char *message, const char *identity, struct conformance *state)
 {
-    p101_fprintf(env, P101_ERROR_OPTIONAL, stderr, "%s:1:1: error: %s: %s: %s [P101-TEST-CONFORMANCE-002]\n", path, library, identity, message);
+    struct p101_tool_diagnostic diagnostic;
+    char                        detail[MAX_LINE];
+    int                         format_status;
+    int                         write_status;
+
+    format_status = snprintf(detail, sizeof(detail), "%s: %s: %s", library, identity, message);
+    if(format_status >= 0 && (size_t)format_status < sizeof(detail))
+    {
+        write_status = p101_tool_diagnostic_initialize_id(&diagnostic, "P101-TEST-CONFORMANCE-002", P101_TOOL_DIAGNOSTIC_ERROR, path, 1U, 1U, identity, detail);
+        if(write_status == 0)
+        {
+            write_status = p101_tool_diagnostic_write(stderr, P101_TOOL_DIAGNOSTIC_TEXT, &diagnostic);
+        }
+        (void)write_status;
+    }
+    (void)env;
     state->findings++;
 }
 

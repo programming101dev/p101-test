@@ -5,6 +5,7 @@
 #include <p101_filesystem/p101_dirent.h>
 #include <p101_json/json.h>
 #include <p101_record/record.h>
+#include <p101_tool_support/diagnostic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,23 +47,24 @@ static bool copy_field(const struct p101_env *env, struct p101_error *err, char 
 
 int main(int argc, char **argv)
 {
-    struct repository_result records[MAX_RECORDS];
-    struct p101_error       *err;
-    struct p101_env         *env;
-    const char              *results_path;
-    const char              *output_path;
-    const char              *message;
-    size_t                   record_count;
-    size_t                   index;
-    bool                     help;
-    bool                     parsed;
-    bool                     loaded;
-    bool                     passed;
-    bool                     written;
-    bool                     has_error;
-    int                      unit_comparison;
-    int                      fuzz_comparison;
-    int                      status;
+    struct repository_result    records[MAX_RECORDS];
+    struct p101_error          *err;
+    struct p101_env            *env;
+    struct p101_tool_diagnostic diagnostic;
+    const char                 *results_path;
+    const char                 *output_path;
+    const char                 *message;
+    size_t                      record_count;
+    size_t                      index;
+    bool                        help;
+    bool                        parsed;
+    bool                        loaded;
+    bool                        passed;
+    bool                        written;
+    bool                        has_error;
+    int                         unit_comparison;
+    int                         fuzz_comparison;
+    int                         status;
 
     err          = p101_error_create(false);
     env          = p101_env_create(err, NULL);
@@ -117,7 +119,11 @@ done:
     if(has_error)
     {
         message = p101_error_get_message(err);
-        p101_fprintf(env, P101_ERROR_OPTIONAL, stderr, "%s:1:1: error: %s [P101-TEST-RECEIPT-001]\n", argv[0], message);
+        status  = p101_tool_diagnostic_initialize_id(&diagnostic, "P101-TEST-RECEIPT-001", P101_TOOL_DIAGNOSTIC_ERROR, argv[0], 1U, 1U, "main", message);
+        if(status == 0)
+        {
+            status = p101_tool_diagnostic_write(stderr, P101_TOOL_DIAGNOSTIC_TEXT, &diagnostic);
+        }
         status = 2;
     }
     p101_env_destroy(env);

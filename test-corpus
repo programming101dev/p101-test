@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# test-corpus — execute and verify the playground lesson corpus.
+
+set -euo pipefail
+root="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+
+exec "$root/components/corpus/run-corpus.py" "$@"
