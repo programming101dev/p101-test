@@ -1,6 +1,6 @@
 set(PROJECT_NAME "p101-test")
 set(PROJECT_VERSION "2.0.0")
-set(PROJECT_DESCRIPTION "Programming 101 executable fault, mutation, and corpus test engines")
+set(PROJECT_DESCRIPTION "Programming 101 executable fault and mutation test engines")
 set(PROJECT_LANGUAGE "C")
 
 set(CMAKE_C_STANDARD 17)

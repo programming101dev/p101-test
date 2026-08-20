@@ -33,7 +33,6 @@ Program examples:
 | `test-faults -O ../p101-inspect/inspect-capture -- ./prog` | Use the in-tree capture launcher |
 | `test-faults -U ../p101-inspect/build-clang/p101-inspect -- ./prog` | Use the in-tree native inspection driver |
 | `test-faults -B ../../libraries/lib_tool_event/build-clang/p101-event-model -- ./prog` | Use an in-tree shared event-model build |
-| `./test-corpus --strict --keep-going -o /tmp/p101-corpus` | Execute and verify every playground lesson fixture and write `/tmp/p101-corpus/receipt.json` |
 
 The final summary groups injected runs by faulted wrapper name and resource
 finding count.

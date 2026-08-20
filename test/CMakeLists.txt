@@ -65,4 +65,3 @@ target_link_libraries(p101_error_path_walk_coverage_cli PRIVATE ${_P101_RESOLVED
 target_compile_options(p101_error_path_walk_coverage_cli PRIVATE ${_COV})
 target_link_options(p101_error_path_walk_coverage_cli PRIVATE ${_COV})
 add_test(NAME test_cli COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/test_cli.sh" "$<TARGET_FILE:p101_error_path_walk_coverage_cli>")
-add_test(NAME test_corpus COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/test_corpus.sh" "${CMAKE_CURRENT_SOURCE_DIR}/../test-corpus")
